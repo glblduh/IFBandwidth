@@ -38,7 +38,7 @@ pcap_session.on("packet", rp => {
 				}
 			}()) {
 				//Push source address, source port, destination address, destination port, size of packet to array
-				databuf.push(JSON.parse('{"saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dport":'+packet.payload.payload.payload.dport+', "size":'+packet.pcap_header.len+'}'));
+				databuf.push(JSON.parse('{"saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "size":'+packet.pcap_header.len+'}'));
 			}
 		}
 	} else {

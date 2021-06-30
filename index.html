@@ -24,6 +24,9 @@
                 let dporttd = document.createElement("td");
                 dporttd.innerText = "Destination Port";
                 dporttd.style.setProperty("color", "tomato");
+                let prototd = document.createElement("td");
+                prototd.innerText = "Protocol";
+                prototd.style.setProperty("color", "paleturquoise");
                 let sizetd = document.createElement("td");
                 sizetd.innerText = "Size";
                 sizetd.style.setProperty("color", "violet");
@@ -31,6 +34,7 @@
                 tr1.appendChild(sporttd);
                 tr1.appendChild(daddrtd);
                 tr1.appendChild(dporttd);
+                tr1.appendChild(prototd);
                 tr1.appendChild(sizetd);
                 table.appendChild(tr1);
                 for(let i=0;i<data.length;i++) {
@@ -49,6 +53,9 @@
                     let dptd = document.createElement("td");
                     dptd.innerText = data[i].dport;
                     dptd.style.setProperty("color", "tomato");
+                    let protd = document.createElement("td");
+                    protd.innerText = function(proto){switch(proto){case 6: {return "TCP"; break;}; case 17: {return "UDP"; break;}; default: {return proto;};}}(data[i].proto);
+                    protd.style.setProperty("color", "paleturquoise");
                     let sitd = document.createElement("td");
                     sitd.innerText = data[i].size / 1000 + "KB";
                     sitd.style.setProperty("color", "violet");
@@ -56,6 +63,7 @@
                     tr.appendChild(sptd);
                     tr.appendChild(dtd);
                     tr.appendChild(dptd);
+                    tr.appendChild(protd);
                     tr.appendChild(sitd);
                     table.appendChild(tr);
                 }
