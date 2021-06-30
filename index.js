@@ -5,12 +5,13 @@
 
 */
 
-const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server);
-let pcap = require("pcap"), pcap_session = pcap.createSession("enx00e04c6801e4");
-let databuf = [];
-
+let ifname = "enx00e04c6801e4"; // The name of the interface
 let buflimit = 20; // The number of packets shown
 let bufconca = true; // If true, concatenates size of duplicates (Slow)
+
+const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server);
+let pcap = require("pcap"), pcap_session = pcap.createSession(ifname);
+let databuf = [];
 
 app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/index.html");

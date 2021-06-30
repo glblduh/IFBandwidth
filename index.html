@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>GLBL Traffic Monitor</title>
+        <title>WebMonitor</title>
         <script src="/socket.io/socket.io.js"></script>
         <script>
             let totalband = 0;
@@ -13,14 +13,19 @@
                 let tr1 = document.createElement("tr");
                 let saddrtd = document.createElement("td");
                 saddrtd.innerText = "Source Address";
+                saddrtd.style.setProperty("color", "palegreen");
                 let sporttd = document.createElement("td");
                 sporttd.innerText = "Source Port";
+                sporttd.style.setProperty("color", "palegreen");
                 let daddrtd = document.createElement("td");
                 daddrtd.innerText = "Destination Address";
+                daddrtd.style.setProperty("color", "tomato");
                 let dporttd = document.createElement("td");
                 dporttd.innerText = "Destination Port";
+                dporttd.style.setProperty("color", "tomato");
                 let sizetd = document.createElement("td");
                 sizetd.innerText = "Size";
+                sizetd.style.setProperty("color", "violet");
                 tr1.appendChild(saddrtd);
                 tr1.appendChild(sporttd);
                 tr1.appendChild(daddrtd);
@@ -29,18 +34,23 @@
                 table.appendChild(tr1);
                 for(let i=0;i<data.length;i++) {
                     totalband += ((data[i].size / 1000) / 1000);
-                    document.getElementById("totalband").innerText = totalband;
+                    document.getElementById("totalband").innerText = totalband.toPrecision(2);
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
                     std.innerText = data[i].saddr;
+                    std.style.setProperty("color", "palegreen");
                     let sptd = document.createElement("td");
                     sptd.innerText = data[i].sport;
+                    sptd.style.setProperty("color", "palegreen");
                     let dtd = document.createElement("td");
                     dtd.innerText = data[i].daddr;
+                    dtd.style.setProperty("color", "tomato");
                     let dptd = document.createElement("td");
                     dptd.innerText = data[i].dport;
+                    dptd.style.setProperty("color", "tomato");
                     let sitd = document.createElement("td");
                     sitd.innerText = data[i].size / 1000 + "KB";
+                    sitd.style.setProperty("color", "violet");
                     tr.appendChild(std);
                     tr.appendChild(sptd);
                     tr.appendChild(dtd);
@@ -50,9 +60,33 @@
                 }
             });
         </script>
+        <style>
+            body {
+                background-color: #141414;
+                color: white;
+                text-align: center;
+                font-family: monospace;
+            }
+            table {
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            }
+            td {
+                border-left: 1px;
+                border-left-color: transparent;
+                border-left-style: solid;
+                border-right: 1px;
+                border-right-color: transparent;
+                border-right-style: solid;
+            }
+            #totalband {
+                color:orchid;
+            }
+        </style>
     </head>
     <body>
-        <h1>Web Monitor</h1>
+        <h1>WebMonitor</h1>
         <p>Total bandwidth: <span id=totalband>0</span>MB</p>
         <table id="traftable"></table>
     </body>
