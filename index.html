@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>GLBL Traffic Monitor</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            let totalband = 0;
+            const socket = io();
+            socket.on("databuf", data => {
+                let table = document.getElementById("traftable");
+                while (table.firstChild) {
+                    table.removeChild(table.lastChild);
+                }
+                let tr1 = document.createElement("tr");
+                let saddrtd = document.createElement("td");
+                saddrtd.innerText = "Source Address";
+                let sporttd = document.createElement("td");
+                sporttd.innerText = "Source Port";
+                let daddrtd = document.createElement("td");
+                daddrtd.innerText = "Destination Address";
+                let dporttd = document.createElement("td");
+                dporttd.innerText = "Destination Port";
+                let sizetd = document.createElement("td");
+                sizetd.innerText = "Size";
+                tr1.appendChild(saddrtd);
+                tr1.appendChild(sporttd);
+                tr1.appendChild(daddrtd);
+                tr1.appendChild(dporttd);
+                tr1.appendChild(sizetd);
+                table.appendChild(tr1);
+                for(let i=0;i<data.length;i++) {
+                    totalband += ((data[i].size / 1000) / 1000);
+                    document.getElementById("totalband").innerText = totalband;
+                    let tr = document.createElement("tr");
+                    let std = document.createElement("td");
+                    std.innerText = data[i].saddr;
+                    let sptd = document.createElement("td");
+                    sptd.innerText = data[i].sport;
+                    let dtd = document.createElement("td");
+                    dtd.innerText = data[i].daddr;
+                    let dptd = document.createElement("td");
+                    dptd.innerText = data[i].dport;
+                    let sitd = document.createElement("td");
+                    sitd.innerText = data[i].size / 1000 + "KB";
+                    tr.appendChild(std);
+                    tr.appendChild(sptd);
+                    tr.appendChild(dtd);
+                    tr.appendChild(dptd);
+                    tr.appendChild(sitd);
+                    table.appendChild(tr);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Web Monitor</h1>
+        <p>Total bandwidth: <span id=totalband>0</span>MB</p>
+        <table id="traftable"></table>
+    </body>
+</html>
