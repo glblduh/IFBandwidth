@@ -6,7 +6,7 @@
 */
 
 let ifname = "enx00e04c6801e4"; // The name of the interface
-let buflimit = 20; // The number of packets shown
+let buflimit = 30; // The number of packets shown
 let bufconca = true; // If true, concatenates size of duplicates (Slow)
 
 const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server);
