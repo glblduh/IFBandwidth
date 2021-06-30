@@ -20,34 +20,15 @@ app.get("/", (req, res) => {
 pcap_session.on("packet", rp => {
 	//Converts raw packets to Object
 	let packet = pcap.decode.packet(rp);
-	let saddr, daddr, sport, dport;
-	//Check if any value is undefined
-	if (packet.payload.payload.saddr != undefined) {
-		saddr = packet.payload.payload.saddr.addr.join(".");
-	} else {
-		saddr = "NULLADDR";
-	}
-	if (packet.payload.payload.daddr != undefined) {
-		daddr = packet.payload.payload.daddr.addr.join(".");
-	} else {
-		daddr = "NULLADDR";
-	}
-	if (packet.payload.payload.payload != undefined && packet.payload.payload.payload.sport != undefined && packet.payload.payload.payload.dport != undefined) {
-		sport = packet.payload.payload.payload.sport;
-		dport = packet.payload.payload.payload.dport;
-	} else {
-		sport = 0;
-		dport = 0;
-	}
 	//Store to buffer until reach the limit
 	if (databuf.length != buflimit) {
-		//Check if addresses are valid
-		if ((saddr.match(/\./g)||[]).length < 4 && (daddr.match(/\./g)||[]).length < 4) {
+		//Check if addresses are valid and if any value is undefined
+		if (packet.payload.payload.saddr != undefined && packet.payload.payload.daddr != undefined && packet.payload.payload.payload != undefined && packet.payload.payload.payload.sport != undefined && packet.payload.payload.payload.dport != undefined && (packet.payload.payload.saddr.addr.join(".").match(/\./g)||[]).length < 4 && (packet.payload.payload.daddr.addr.join(".").match(/\./g)||[]).length < 4) {
 			if (!function (){
 				if (bufconca) {
 					//Concatenates size of duplicate packets
 					for(let i=0;i<databuf.length;i++) {
-						if (databuf[i].saddr === saddr && databuf[i].sport === sport && databuf[i].daddr === daddr && databuf[i].dport === dport) {
+						if (databuf[i].saddr === packet.payload.payload.saddr.addr.join(".") && databuf[i].sport === packet.payload.payload.payload.sport && databuf[i].daddr === packet.payload.payload.daddr.addr.join(".") && databuf[i].dport === packet.payload.payload.payload.dport) {
 							databuf[i].size += packet.pcap_header.len;
 							return true;
 						}
@@ -57,7 +38,7 @@ pcap_session.on("packet", rp => {
 				}
 			}()) {
 				//Push source address, source port, destination address, destination port, size of packet to array
-				databuf.push(JSON.parse('{"saddr":"'+saddr+'", "sport":'+sport+', "daddr":"'+daddr+'", "dport":'+dport+', "size":'+packet.pcap_header.len+'}'));
+				databuf.push(JSON.parse('{"saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dport":'+packet.payload.payload.payload.dport+', "size":'+packet.pcap_header.len+'}'));
 			}
 		}
 	} else {
