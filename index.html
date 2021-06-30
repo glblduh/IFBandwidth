@@ -34,7 +34,7 @@
                 table.appendChild(tr1);
                 for(let i=0;i<data.length;i++) {
                     totalband += ((data[i].size / 1000) / 1000);
-                    document.getElementById("totalband").innerText = totalband.toPrecision(2);
+                    document.getElementById("totalband").innerText = totalband.toPrecision(3);
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
                     std.innerText = data[i].saddr;
