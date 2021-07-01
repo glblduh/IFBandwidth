@@ -40,13 +40,13 @@
                     document.getElementById("totalband").innerText = ((data.size / 1000) / 1000).toFixed(2);
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
-                    std.innerText = data.data[i].saddr;
+                    std.innerText = data.data[i].shost;
                     std.style.setProperty("color", "palegreen");
                     let sptd = document.createElement("td");
                     sptd.innerText = data.data[i].sport;
                     sptd.style.setProperty("color", "palegreen");
                     let dtd = document.createElement("td");
-                    dtd.innerText = data.data[i].daddr;
+                    dtd.innerText = data.data[i].dhost;
                     dtd.style.setProperty("color", "tomato");
                     let dptd = document.createElement("td");
                     dptd.innerText = data.data[i].dport;

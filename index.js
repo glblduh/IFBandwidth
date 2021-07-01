@@ -9,7 +9,7 @@
 
 */
 
-const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2));
+const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2)), dns = require("dns").promises;
 if (argv.i == undefined || typeof argv.i === "boolean") {console.error("Please enter a interface name using the -i argument"); process.exit();}
 let pcap = require("pcap"), pcap_session = pcap.createSession(argv.i);
 let databuf = [];
@@ -27,10 +27,21 @@ setInterval(() => {
 		}
 	}
 	databuf = databuf.sort(function(a, b){return b.size - a.size});
+	console.log(databuf);
 	io.emit("databuf", {data: databuf, size: sizebuf});
 }, 500);
 
-pcap_session.on("packet", rp => {
+//Handles the reverse dns and handles rejections
+async function reversedns(ip) {
+	try {
+		let hn = await dns.reverse(ip);
+		return hn[0];
+	} catch(e) {
+		return ip;
+	}
+}
+
+pcap_session.on("packet", async rp => {
 	//Converts raw packets to Object
 	let packet = pcap.decode.packet(rp);
 	//Check if addresses are valid and if any value is undefined
@@ -48,7 +59,7 @@ pcap_session.on("packet", rp => {
 		}()) {
 			sizebuf += packet.pcap_header.len;
 			//Push source address, source port, destination address, destination port, size of packet to array
-			databuf.push(JSON.parse('{"time":'+Date.now()+', "saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "size":'+packet.pcap_header.len+'}'));
+			databuf.push(JSON.parse('{"time":'+Date.now()+', "saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "shost":"'+await reversedns(packet.payload.payload.saddr.addr.join("."))+'", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dhost":"'+await reversedns(packet.payload.payload.daddr.addr.join("."))+'", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "size":'+packet.pcap_header.len+'}'));
 		}
 	}
 });
