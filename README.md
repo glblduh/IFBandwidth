@@ -7,3 +7,8 @@ Instructions are as follows
 1. Clone or download the repo
 2. Run npm install
 3. Start with root privileges
+
+## Arguments:
+
+- -i: To specify interface (This is required)
+- -p: To specify port (The default is 1010)

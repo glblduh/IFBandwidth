@@ -3,13 +3,15 @@
 	Made by glblduh
 	GitHub: https://github.com/glblduh/WebMonitor
 
+	Arguments:
+	-i: To specify interface
+	-p: To specify port
+
 */
 
-let ifname = "enx00e04c6801e4"; // The name of the interface
-let refreshms = 500; // The amount of time to recheck the databuf array (millisecond)
-
-const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server);
-let pcap = require("pcap"), pcap_session = pcap.createSession(ifname);
+const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2));
+if (argv.i == undefined || typeof argv.i === "boolean") {console.error("Please enter a interface name using the -i argument"); process.exit();}
+let pcap = require("pcap"), pcap_session = pcap.createSession(argv.i);
 let databuf = [];
 let sizebuf = 0;
 
@@ -26,7 +28,7 @@ setInterval(() => {
 	}
 	databuf = databuf.sort(function(a, b){return b.size - a.size});
 	io.emit("databuf", {data: databuf, size: sizebuf});
-}, refreshms);
+}, 500);
 
 pcap_session.on("packet", rp => {
 	//Converts raw packets to Object
@@ -51,4 +53,4 @@ pcap_session.on("packet", rp => {
 	}
 });
 
-server.listen(6699);
+server.listen(argv.p || 1010);
