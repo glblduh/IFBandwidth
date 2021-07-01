@@ -27,7 +27,6 @@ setInterval(() => {
 		}
 	}
 	databuf = databuf.sort(function(a, b){return b.size - a.size});
-	console.log(databuf);
 	io.emit("databuf", {data: databuf, size: sizebuf});
 }, 500);
 
