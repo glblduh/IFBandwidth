@@ -4,7 +4,6 @@
         <title>WebMonitor</title>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            let totalband = 0;
             const socket = io();
             socket.on("databuf", data => {
                 let table = document.getElementById("traftable");
@@ -37,27 +36,26 @@
                 tr1.appendChild(prototd);
                 tr1.appendChild(sizetd);
                 table.appendChild(tr1);
-                for(let i=0;i<data.length;i++) {
-                    totalband += ((data[i].size / 1000) / 1000);
-                    document.getElementById("totalband").innerText = totalband.toPrecision(3);
+                for(let i=0;i<data.data.length;i++) {
+                    document.getElementById("totalband").innerText = ((data.size / 1000) / 1000).toFixed(2);
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
-                    std.innerText = data[i].saddr;
+                    std.innerText = data.data[i].saddr;
                     std.style.setProperty("color", "palegreen");
                     let sptd = document.createElement("td");
-                    sptd.innerText = data[i].sport;
+                    sptd.innerText = data.data[i].sport;
                     sptd.style.setProperty("color", "palegreen");
                     let dtd = document.createElement("td");
-                    dtd.innerText = data[i].daddr;
+                    dtd.innerText = data.data[i].daddr;
                     dtd.style.setProperty("color", "tomato");
                     let dptd = document.createElement("td");
-                    dptd.innerText = data[i].dport;
+                    dptd.innerText = data.data[i].dport;
                     dptd.style.setProperty("color", "tomato");
                     let protd = document.createElement("td");
-                    protd.innerText = function(proto){switch(proto){case 6: {return "TCP"; break;}; case 17: {return "UDP"; break;}; default: {return proto;};}}(data[i].proto);
+                    protd.innerText = function(proto){switch(proto){case 6: {return "TCP"; break;}; case 17: {return "UDP"; break;}; default: {return proto;};}}(data.data[i].proto);
                     protd.style.setProperty("color", "paleturquoise");
                     let sitd = document.createElement("td");
-                    sitd.innerText = data[i].size / 1000 + "KB";
+                    sitd.innerText = data.data[i].size / 1000 + "KB";
                     sitd.style.setProperty("color", "violet");
                     tr.appendChild(std);
                     tr.appendChild(sptd);
