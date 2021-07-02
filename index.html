@@ -5,11 +5,18 @@
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const socket = io();
+            socket.on("connect", () => {
+                // Auth client to server
+                socket.emit("auth", "webmonitordefaultkey");
+            });
+            // Initiate the databuf event listener
             socket.on("databuf", data => {
                 let table = document.getElementById("traftable");
+                // Removes previous data on table
                 while (table.firstChild) {
                     table.removeChild(table.lastChild);
                 }
+                //Makes the header of the table
                 let tr1 = document.createElement("tr");
                 let saddrtd = document.createElement("td");
                 saddrtd.innerText = "Source";
@@ -36,6 +43,7 @@
                 tr1.appendChild(prototd);
                 tr1.appendChild(sizetd);
                 table.appendChild(tr1);
+                // Loops through databuf array and makes rows according to data
                 for(let i=0;i<data.data.length;i++) {
                     document.getElementById("totalband").innerText = ((data.size / 1000) / 1000).toFixed(2);
                     let tr = document.createElement("tr");

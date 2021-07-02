@@ -12,3 +12,4 @@ Instructions are as follows
 
 - -i: To specify interface (This is required)
 - -p: To specify port (The default is 1010)
+- --auth: To enable authentication (username:password)

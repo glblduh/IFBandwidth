@@ -6,15 +6,36 @@
 	Arguments:
 	-i: To specify interface
 	-p: To specify port
+	--auth: To enable authentication (username:password)
 
 */
 
-const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2)), dns = require("dns").promises;
+const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2)), dns = require("dns").promises, basicAuth = require("express-basic-auth");
 if (argv.i == undefined || typeof argv.i === "boolean") {console.error("Please enter a interface name using the -i argument"); process.exit();}
 let pcap = require("pcap"), pcap_session = pcap.createSession(argv.i);
 let databuf = []; // Buffer of packet information
 let sizebuf = 0; // Buffer of the total size of all packets
+let siokey = "webmonitordefaultkey"; // SocketIO authed room key
 
+// Checks if -auth argument is present and checks if value is valid
+if (argv.auth != undefined && typeof argv.auth === "string") {
+	let cred = argv.auth.split(":");
+	app.use(basicAuth({
+		users: {[cred[0]]: cred[1]},
+		challenge: true
+	}));
+}
+
+// Authenticate the client based on the siokey variable
+io.on("connection", socket => {
+	socket.on("auth", key => {
+		if (key === siokey) {
+			socket.join("authed");
+		}
+	});
+});
+
+// Server index.html to client
 app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/index.html");
 });
@@ -47,7 +68,7 @@ setInterval(() => {
 		}
 	}
 	databuf = databuf.sort(function(a, b){return b.size - a.size});
-	io.emit("databuf", {data: databuf, size: sizebuf});
+	io.in("authed").emit("databuf", {data: databuf, size: sizebuf});
 }, 500);
 
 pcap_session.on("packet", rp => {
@@ -72,4 +93,5 @@ pcap_session.on("packet", rp => {
 	}
 });
 
+// Start the http server to listen on port
 server.listen(argv.p || 1010);
