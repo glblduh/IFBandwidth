@@ -9,6 +9,10 @@
                 // Auth client to server
                 socket.emit("auth", "webmonitordefaultkey");
             });
+            // Event for the first data sent by the sever
+            socket.on("initinfo", data => {
+                document.getElementById("header").innerText = "WebMonitor ("+data.ifname+")";
+            });
             // Initiate the databuf event listener
             socket.on("databuf", data => {
                 let table = document.getElementById("traftable");
@@ -18,34 +22,35 @@
                 }
                 //Makes the header of the table
                 let tr1 = document.createElement("tr");
-                let saddrtd = document.createElement("td");
-                saddrtd.innerText = "Source";
-                saddrtd.style.setProperty("color", "palegreen");
-                let sporttd = document.createElement("td");
-                sporttd.innerText = "Source Port";
-                sporttd.style.setProperty("color", "palegreen");
-                let daddrtd = document.createElement("td");
-                daddrtd.innerText = "Destination";
-                daddrtd.style.setProperty("color", "tomato");
-                let dporttd = document.createElement("td");
-                dporttd.innerText = "Destination Port";
-                dporttd.style.setProperty("color", "tomato");
-                let prototd = document.createElement("td");
-                prototd.innerText = "Protocol";
-                prototd.style.setProperty("color", "paleturquoise");
-                let sizetd = document.createElement("td");
-                sizetd.innerText = "Size";
-                sizetd.style.setProperty("color", "violet");
-                tr1.appendChild(saddrtd);
-                tr1.appendChild(sporttd);
-                tr1.appendChild(daddrtd);
-                tr1.appendChild(dporttd);
-                tr1.appendChild(prototd);
-                tr1.appendChild(sizetd);
+                let saddrth = document.createElement("th");
+                saddrth.innerText = "Source";
+                saddrth.style.setProperty("color", "palegreen");
+                let sportth = document.createElement("th");
+                sportth.innerText = "Source Port";
+                sportth.style.setProperty("color", "palegreen");
+                let daddrth = document.createElement("th");
+                daddrth.innerText = "Destination";
+                daddrth.style.setProperty("color", "tomato");
+                let dportth = document.createElement("th");
+                dportth.innerText = "Destination Port";
+                dportth.style.setProperty("color", "tomato");
+                let prototh = document.createElement("th");
+                prototh.innerText = "Protocol";
+                prototh.style.setProperty("color", "paleturquoise");
+                let sizeth = document.createElement("th");
+                sizeth.innerText = "Size";
+                sizeth.style.setProperty("color", "violet");
+                tr1.appendChild(saddrth);
+                tr1.appendChild(sportth);
+                tr1.appendChild(daddrth);
+                tr1.appendChild(dportth);
+                tr1.appendChild(prototh);
+                tr1.appendChild(sizeth);
                 table.appendChild(tr1);
                 // Loops through databuf array and makes rows according to data
                 for(let i=0;i<data.data.length;i++) {
                     document.getElementById("totalband").innerText = ((data.size / 1000) / 1000).toFixed(2);
+                    document.title = "WebMonitor ["+((data.size / 1000) / 1000).toFixed(2)+"MB]";
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
                     std.innerText = data.data[i].shost;
@@ -87,22 +92,21 @@
                 margin-right: auto;
                 text-align: center;
             }
+            th {
+                font-size: 14px;
+                padding:0 10px;
+            }
             td {
-                border-left: 1px;
-                border-left-color: transparent;
-                border-left-style: solid;
-                border-right: 1px;
-                border-right-color: transparent;
-                border-right-style: solid;
+                padding:0 5px;
             }
             #totalband {
-                color:palevioletred;
+                color:lightsalmon;
             }
         </style>
     </head>
     <body>
-        <h1>WebMonitor</h1>
-        <p>Total bandwidth: <span id=totalband>0</span>MB</p>
+        <h1 id="header">WebMonitor</h1>
+        <h3>Total bandwidth: <span id=totalband>0</span>MB</h3>
         <table id="traftable"></table>
     </body>
 </html>

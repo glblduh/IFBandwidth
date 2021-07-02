@@ -31,6 +31,7 @@ io.on("connection", socket => {
 	socket.on("auth", key => {
 		if (key === siokey) {
 			socket.join("authed");
+			socket.emit("initinfo", {ifname: argv.i});
 		}
 	});
 });
@@ -42,19 +43,21 @@ app.get("/", (req, res) => {
 
 //Checks the databuf for non-resolved addresses and tries to resolve it
 setInterval(async () => {
-	for(let i=0;i<databuf.length;i++) {
-		if (databuf[i].shost === "") {
-			try {
-				databuf[i].shost = (await dns.reverse(databuf[i].saddr))[0];
-			} catch(e) {
-				databuf[i].shost = databuf[i].saddr;
+	if (databuf.length > 1) {
+		for(let i=0;i<databuf.length;i++) {
+			if (databuf[i].shost === "") {
+				try {
+					databuf[i].shost = (await dns.reverse(databuf[i].saddr))[0];
+				} catch(e) {
+					databuf[i].shost = databuf[i].saddr;
+				}
 			}
-		}
-		if (databuf[i].dhost === "") {
-			try {
-				databuf[i].dhost = (await dns.reverse(databuf[i].daddr))[0];
-			} catch(e) {
-				databuf[i].dhost = databuf[i].daddr;
+			if (databuf[i].dhost === "") {
+				try {
+					databuf[i].dhost = (await dns.reverse(databuf[i].daddr))[0];
+				} catch(e) {
+					databuf[i].dhost = databuf[i].daddr;
+				}
 			}
 		}
 	}
@@ -62,13 +65,15 @@ setInterval(async () => {
 
 //Rechecks databuf array to remove old packets and sends data to web
 setInterval(() => {
-	for(let i=0;i<databuf.length;i++) {
-		if (Date.now()-databuf[i].time > 21000) {
-			databuf.splice(i, 1);
+	if (databuf.length > 1) {
+		for(let i=0;i<databuf.length;i++) {
+			if (Date.now()-databuf[i].time > 21000) {
+				databuf.splice(i, 1);
+			}
 		}
+		databuf = databuf.sort(function(a, b){return b.size - a.size});
+		io.in("authed").emit("databuf", {data: databuf, size: sizebuf});
 	}
-	databuf = databuf.sort(function(a, b){return b.size - a.size});
-	io.in("authed").emit("databuf", {data: databuf, size: sizebuf});
 }, 500);
 
 pcap_session.on("packet", rp => {
