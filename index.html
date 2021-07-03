@@ -4,6 +4,7 @@
         <title>IFBandwidth</title>
         <script src="/socket.io/socket.io.js"></script>
         <script>
+            let totalin = 0, totalout = 0;
             const socket = io();
             socket.on("connect", () => {
                 // Auth client to server
@@ -15,6 +16,8 @@
             });
             // Initiate the databuf event listener
             socket.on("databuf", data => {
+                totalin = 0;
+                totalout = 0;
                 let table = document.getElementById("traftable");
                 // Removes previous data on table
                 while (table.firstChild) {
@@ -37,20 +40,28 @@
                 let prototh = document.createElement("th");
                 prototh.innerText = "Protocol";
                 prototh.style.setProperty("color", "paleturquoise");
-                let sizeth = document.createElement("th");
-                sizeth.innerText = "Size";
-                sizeth.style.setProperty("color", "violet");
+                let insizeth = document.createElement("th");
+                insizeth.innerText = "In";
+                insizeth.style.setProperty("color", "pink");
+                let outsizeth = document.createElement("th");
+                outsizeth.innerText = "Out";
+                outsizeth.style.setProperty("color", "violet");
                 tr1.appendChild(saddrth);
                 tr1.appendChild(sportth);
                 tr1.appendChild(daddrth);
                 tr1.appendChild(dportth);
                 tr1.appendChild(prototh);
-                tr1.appendChild(sizeth);
+                tr1.appendChild(insizeth);
+                tr1.appendChild(outsizeth);
                 table.appendChild(tr1);
                 // Loops through databuf array and makes rows according to data
                 for(let i=0;i<data.data.length;i++) {
                     document.getElementById("totalband").innerText = ((data.size / 1000) / 1000).toFixed(2);
                     document.title = "IFBandwidth ["+((data.size / 1000) / 1000).toFixed(2)+"MB]";
+                    totalin += ((data.data[i].insize / 1000) / 1000);
+                    document.getElementById("totalin").innerText = totalin.toFixed(2);
+                    totalout += ((data.data[i].outsize / 1000) / 1000);
+                    document.getElementById("totalout").innerText = totalout.toFixed(2);
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
                     std.innerText = data.data[i].shost;
@@ -67,15 +78,19 @@
                     let protd = document.createElement("td");
                     protd.innerText = function(proto){switch(proto){case 6: {return "TCP"; break;}; case 17: {return "UDP"; break;}; default: {return proto;};}}(data.data[i].proto);
                     protd.style.setProperty("color", "paleturquoise");
-                    let sitd = document.createElement("td");
-                    sitd.innerText = data.data[i].size / 1000 + "KB";
-                    sitd.style.setProperty("color", "violet");
+                    let insitd = document.createElement("td");
+                    insitd.innerText = data.data[i].insize / 1000 + "kB";
+                    insitd.style.setProperty("color", "pink");
+                    let outsitd = document.createElement("td");
+                    outsitd.innerText = data.data[i].outsize / 1000 + "kB";
+                    outsitd.style.setProperty("color", "violet");
                     tr.appendChild(std);
                     tr.appendChild(sptd);
                     tr.appendChild(dtd);
                     tr.appendChild(dptd);
                     tr.appendChild(protd);
-                    tr.appendChild(sitd);
+                    tr.appendChild(insitd);
+                    tr.appendChild(outsitd);
                     table.appendChild(tr);
                 }
             });
@@ -102,11 +117,17 @@
             #totalband {
                 color:lightsalmon;
             }
+            #totalin {
+                color: pink;
+            }
+            #totalout {
+                color: violet;
+            }
         </style>
     </head>
     <body>
         <h1 id="header">IFBandwidth</h1>
-        <h3>Total bandwidth: <span id=totalband>0</span>MB</h3>
+        <h3>Total: <span id=totalband>0</span>MB &nbsp;&nbsp;&nbsp;&nbsp;IN: <span id="totalin">0</span>MB&nbsp;&nbsp;&nbsp;&nbsp;OUT: <span id="totalout">0</span>MB</h3>
         <table id="traftable"></table>
     </body>
 </html>

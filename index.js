@@ -71,7 +71,8 @@ setInterval(() => {
 				databuf.splice(i, 1);
 			}
 		}
-		databuf = databuf.sort(function(a, b){return b.size - a.size});
+		// Puts the largest packet to the top of array
+		databuf = databuf.sort(function(a, b){return (b.insize+b.outsize) - (a.insize+a.outsize)});
 		io.in("authed").emit("databuf", {data: databuf, size: sizebuf});
 	}
 }, 500);
@@ -84,15 +85,22 @@ pcap_session.on("packet", rp => {
 		if (!function(){
 				//Concatenates size of duplicate packets
 				for(let i=0;i<databuf.length;i++) {
+					// For outgoing packets
 					if (databuf[i].saddr === packet.payload.payload.saddr.addr.join(".") && databuf[i].sport === packet.payload.payload.payload.sport && databuf[i].daddr === packet.payload.payload.daddr.addr.join(".") && databuf[i].dport === packet.payload.payload.payload.dport) {
 						databuf[i].time = Date.now();
-						databuf[i].size += packet.pcap_header.len;
+						databuf[i].outsize += packet.pcap_header.len;
+						return true;
+					}
+					// For incoming packets
+					if (databuf[i].saddr === packet.payload.payload.daddr.addr.join(".") && databuf[i].sport === packet.payload.payload.payload.dport && databuf[i].daddr === packet.payload.payload.saddr.addr.join(".") && databuf[i].dport === packet.payload.payload.payload.sport) {
+						databuf[i].time = Date.now();
+						databuf[i].insize += packet.pcap_header.len;
 						return true;
 					}
 				}
 		}()) {
 			//Push source address, source port, destination address, destination port, size of packet to array
-			databuf.push(JSON.parse('{"time":'+Date.now()+', "saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "shost":"", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dhost":"", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "size":'+packet.pcap_header.len+'}'));
+			databuf.push(JSON.parse('{"time":'+Date.now()+', "saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "shost":"", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dhost":"", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "outsize":'+packet.pcap_header.len+', "insize":0}'));
 		}
 		sizebuf += packet.pcap_header.len;
 	}
