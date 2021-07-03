@@ -1,17 +1,17 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>WebMonitor</title>
+        <title>IFBandwidth</title>
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const socket = io();
             socket.on("connect", () => {
                 // Auth client to server
-                socket.emit("auth", "webmonitordefaultkey");
+                socket.emit("auth", "ifbandwidthdefaultkey");
             });
             // Event for the first data sent by the sever
             socket.on("initinfo", data => {
-                document.getElementById("header").innerText = "WebMonitor ("+data.ifname+")";
+                document.getElementById("header").innerText = "IFBandwidth ("+data.ifname+")";
             });
             // Initiate the databuf event listener
             socket.on("databuf", data => {
@@ -50,7 +50,7 @@
                 // Loops through databuf array and makes rows according to data
                 for(let i=0;i<data.data.length;i++) {
                     document.getElementById("totalband").innerText = ((data.size / 1000) / 1000).toFixed(2);
-                    document.title = "WebMonitor ["+((data.size / 1000) / 1000).toFixed(2)+"MB]";
+                    document.title = "IFBandwidth ["+((data.size / 1000) / 1000).toFixed(2)+"MB]";
                     let tr = document.createElement("tr");
                     let std = document.createElement("td");
                     std.innerText = data.data[i].shost;
@@ -105,7 +105,7 @@
         </style>
     </head>
     <body>
-        <h1 id="header">WebMonitor</h1>
+        <h1 id="header">IFBandwidth</h1>
         <h3>Total bandwidth: <span id=totalband>0</span>MB</h3>
         <table id="traftable"></table>
     </body>

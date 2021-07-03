@@ -1,7 +1,7 @@
 /*
 
 	Made by glblduh
-	GitHub: https://github.com/glblduh/WebMonitor
+	GitHub: https://github.com/glblduh/IFBandwidth
 
 	Arguments:
 	-i: To specify interface
@@ -15,7 +15,7 @@ if (argv.i == undefined || typeof argv.i === "boolean") {console.error("Please e
 let pcap = require("pcap"), pcap_session = pcap.createSession(argv.i);
 let databuf = []; // Buffer of packet information
 let sizebuf = 0; // Buffer of the total size of all packets
-let siokey = "webmonitordefaultkey"; // SocketIO authed room key
+let siokey = "ifbandwidthdefaultkey"; // SocketIO authed room key
 
 // Checks if -auth argument is present and checks if value is valid
 if (argv.auth != undefined && typeof argv.auth === "string") {
@@ -45,14 +45,14 @@ app.get("/", (req, res) => {
 setInterval(async () => {
 	if (databuf.length > 1) {
 		for(let i=0;i<databuf.length;i++) {
-			if (databuf[i].shost != undefined && databuf[i].shost === "") {
+			if (databuf[i] != undefined && databuf[i].shost === "") {
 				try {
 					databuf[i].shost = (await dns.reverse(databuf[i].saddr))[0];
 				} catch(e) {
 					databuf[i].shost = databuf[i].saddr;
 				}
 			}
-			if (databuf[i].dhost != undefined && databuf[i].dhost === "") {
+			if (databuf[i] != undefined && databuf[i].dhost === "") {
 				try {
 					databuf[i].dhost = (await dns.reverse(databuf[i].daddr))[0];
 				} catch(e) {
