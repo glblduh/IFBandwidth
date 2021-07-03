@@ -45,14 +45,14 @@ app.get("/", (req, res) => {
 setInterval(async () => {
 	if (databuf.length > 1) {
 		for(let i=0;i<databuf.length;i++) {
-			if (databuf[i].shost === "") {
+			if (databuf[i].shost != undefined && databuf[i].shost === "") {
 				try {
 					databuf[i].shost = (await dns.reverse(databuf[i].saddr))[0];
 				} catch(e) {
 					databuf[i].shost = databuf[i].saddr;
 				}
 			}
-			if (databuf[i].dhost === "") {
+			if (databuf[i].dhost != undefined && databuf[i].dhost === "") {
 				try {
 					databuf[i].dhost = (await dns.reverse(databuf[i].daddr))[0];
 				} catch(e) {
