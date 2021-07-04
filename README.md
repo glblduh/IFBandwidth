@@ -1,6 +1,6 @@
-# WebMonitor
+# IFBandwidth
 
-Monitor packets going in and out of a specific interface with a web interface.  
+Monitors bandwidth of each packets going in and out of a specific interface with a clean web interface.  
 This needs libpcap0.8-dev to be installed
 
 Instructions are as follows
