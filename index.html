@@ -3,7 +3,7 @@
         <title>IFBandwidth</title>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            let totalin = 0, totalout = 0;
+            let totalin = 0, totalout = 0, buftime = 0;
             const socket = io();
             socket.on("connect", () => {
                 // Auth client to server
@@ -92,7 +92,17 @@
                     tr.appendChild(outsitd);
                     table.appendChild(tr);
                 }
+                buftime = Date.now();
             });
+            //Checks if last update to table is more than 5 seconds then clears it
+            setInterval(() => {
+                let table = document.getElementById("traftable");
+                if (table.firstChild && Date.now()-buftime > 5000) {
+                    while (table.firstChild) {
+                        table.removeChild(table.lastChild);
+                    }
+                }
+            }, 100);
         </script>
         <style>
             body {
