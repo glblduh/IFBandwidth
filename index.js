@@ -10,7 +10,8 @@
 
 */
 
-const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2)), dns = require("dns").promises, basicAuth = require("express-basic-auth");
+const express = require("express"), http = require("http"), app = express(), server = http.createServer(app), { Server } = require("socket.io"), io = new Server(server), argv = require("minimist")(process.argv.splice(2)), dns = require("dns").promises, basicAuth = require("express-basic-auth"), dnscache = require("dnscache")({"enable":true});
+
 if (argv.i == undefined || typeof argv.i === "boolean") {console.error("Please enter a interface name using the -i argument"); process.exit();}
 let pcap = require("pcap"), pcap_session = pcap.createSession(argv.i);
 let databuf = []; // Buffer of packet information
