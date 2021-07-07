@@ -46,23 +46,25 @@ app.get("/", (req, res) => {
 setInterval(async () => {
 	if (databuf.length > 1) {
 		for(let i=0;i<databuf.length;i++) {
-			if (databuf[i] != undefined && databuf[i].shost === "") {
+			if (!databuf[i].squeried) {
 				try {
 					databuf[i].shost = (await dns.reverse(databuf[i].saddr))[0];
+					databuf[i].squeried = true;
 				} catch(e) {
-					databuf[i].shost = databuf[i].saddr;
+					databuf[i].squeried = true;
 				}
 			}
-			if (databuf[i] != undefined && databuf[i].dhost === "") {
+			if (!databuf[i].dqueried) {
 				try {
 					databuf[i].dhost = (await dns.reverse(databuf[i].daddr))[0];
+					databuf[i].dqueried = true;
 				} catch(e) {
-					databuf[i].dhost = databuf[i].daddr;
+					databuf[i].dqueried = true;
 				}
 			}
 		}
 	}
-}, 100);
+}, 5000);
 
 //Rechecks databuf array to remove old packets and sends data to web
 setInterval(() => {
@@ -101,7 +103,7 @@ pcap_session.on("packet", rp => {
 				}
 		}()) {
 			//Push source address, source port, destination address, destination port, size of packet to array
-			databuf.push(JSON.parse('{"time":'+Date.now()+', "saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "shost":"", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dhost":"", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "outsize":'+packet.pcap_header.len+', "insize":0}'));
+			databuf.push(JSON.parse('{"time":'+Date.now()+', "squeried": false, "dqueried": false, "saddr":"'+packet.payload.payload.saddr.addr.join(".")+'", "shost":"'+packet.payload.payload.saddr.addr.join(".")+'", "sport":'+packet.payload.payload.payload.sport+', "daddr":"'+packet.payload.payload.daddr.addr.join(".")+'", "dhost":"'+packet.payload.payload.daddr.addr.join(".")+'", "dport":'+packet.payload.payload.payload.dport+', "proto":'+packet.payload.payload.protocol+', "outsize":'+packet.pcap_header.len+', "insize":0}'));
 		}
 		sizebuf += packet.pcap_header.len;
 	}
